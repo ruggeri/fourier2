@@ -21,12 +21,36 @@ fn play<F>(file: &mut File, f: &F, duration: f64)
 }
 
 fn main() {
-  let notes: Vec<Note> = vec![
-    Note::new("A.3".parse().unwrap(), 0.0, 4.0, 0.1),
-    Note::new("C.3".parse().unwrap(), 1.0, 4.0, 0.1),
-    Note::new("E.3".parse().unwrap(), 2.0, 4.0, 0.1),
-    Note::new("A.4".parse().unwrap(), 3.0, 4.0, 0.1),
-  ];
+  let mut notes = vec![];
+
+  notes.extend(vec![
+    Note::new("A.3".parse().unwrap(), 0.00, 1.00, 0.1),
+    Note::new("C.3".parse().unwrap(), 0.25, 0.75, 0.1),
+    Note::new("E.3".parse().unwrap(), 0.50, 0.50, 0.1),
+    Note::new("A.4".parse().unwrap(), 0.75, 0.25, 0.1),
+  ]);
+
+  notes.extend(vec![
+    Note::new("F.2".parse().unwrap(), 1.00, 1.00, 0.1),
+    Note::new("A.3".parse().unwrap(), 1.25, 0.75, 0.1),
+    Note::new("C.3".parse().unwrap(), 1.50, 0.50, 0.1),
+    Note::new("F.3".parse().unwrap(), 1.75, 0.25, 0.1),
+  ]);
+
+  notes.extend(vec![
+    Note::new("D.2".parse().unwrap(), 2.00, 1.00, 0.1),
+    Note::new("F.2".parse().unwrap(), 2.25, 0.75, 0.1),
+    Note::new("A.3".parse().unwrap(), 2.50, 0.50, 0.1),
+    Note::new("D.3".parse().unwrap(), 2.75, 0.25, 0.1),
+  ]);
+
+  notes.extend(vec![
+    Note::new("G.1".parse().unwrap(), 3.00, 2.00, 0.1),
+    Note::new("B.2".parse().unwrap(), 3.25, 1.75, 0.1),
+    Note::new("D.2".parse().unwrap(), 3.50, 1.50, 0.1),
+    Note::new("G.2".parse().unwrap(), 3.75, 0.25, 0.1),
+    Note::new("F.2".parse().unwrap(), 4.00, 1.00, 0.1),
+  ]);
 
   let f = |t| {
     Note::total_val(notes.iter(), t)
@@ -34,14 +58,14 @@ fn main() {
 
   println!("Writing PCM file!");
   let mut file = File::create("./samples.pcm").unwrap();
-  play(&mut file, &f, 4.0);
+  play(&mut file, &f, 5.0);
 
   println!("Searching for freqs!");
 
-  let mut t = 0.5;
-  while t < 4.0 {
-    println!("{:?}", scale::scan(&f, t));
+  let mut t = 0.125;
+  while t < 5.0 {
+    println!("{}: {:?}", t, scale::scan(&f, t));
 
-    t += 1.0;
+    t += 0.25;
   }
 }
