@@ -1,0 +1,10 @@
+[package]
+authors = ["Ned Ruggeri <ruggeri@self-loop.com>"]
+name = "fourier2"
+version = "0.1.0"
+
+[dependencies]
+byteorder = "1.2.3"
+
+[lib]
+name = "fourier2"
