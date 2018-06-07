@@ -17,6 +17,15 @@ impl Note {
     }
   }
 
+  pub fn total_val<'a, T: Iterator<Item=&'a Note>>(notes: T, t: f64) -> f64 {
+    let mut val = 0.0;
+    for note in notes {
+      val += note.val(t);
+    }
+
+    val
+  }
+
   pub fn val(&self, t: f64) -> f64 {
     if t < self.start_time {
       0.0
