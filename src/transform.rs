@@ -1,12 +1,9 @@
-use constants;
+use constants::*;
 use util;
-
-const WINDOW_WIDTH: f64 = 0.02_f64;
-const FOURIER_SAMPLE_RATE_PER_SEC: f64 = constants::SAMPLE_RATE / 10.0_f64;
 
 pub fn ftransform<F>(freq: f64, fun: F, window_center: f64) -> (f64, f64)
   where F: Fn(f64) -> f64 {
-  let start = (window_center - WINDOW_WIDTH).max(0.0_f64);
+  let start = (window_center - FOURIER_WINDOW_WIDTH).max(0.0_f64);
   let end = window_center + (window_center - start);
   let total_width = end - start;
   let num_samples = total_width * FOURIER_SAMPLE_RATE_PER_SEC;
