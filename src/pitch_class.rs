@@ -1,3 +1,4 @@
+use std::fmt;
 use std::str::FromStr;
 
 #[derive(Debug)]
@@ -57,5 +58,11 @@ impl FromStr for PitchClass {
       "G" => Ok(G),
       _ => Err(UnknownPitchClass),
     }
+  }
+}
+
+impl fmt::Display for PitchClass {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    write!(f, "{:?}", self)
   }
 }

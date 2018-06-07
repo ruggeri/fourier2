@@ -1,8 +1,8 @@
 use pitch_class::{PitchClass, PitchClassParseErr};
+use std::fmt;
 use std::str::FromStr;
 use util;
 
-#[derive(Debug)]
 pub struct Pitch {
   pitch_class: PitchClass,
   sharp: bool,
@@ -65,5 +65,19 @@ impl FromStr for Pitch {
       sharp,
       octave,
     })
+  }
+}
+
+impl fmt::Display for Pitch {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let accidental_symbol = if self.sharp { "#" } else { "." };
+
+    write!(f, "{}{}{}", self.pitch_class, accidental_symbol, self.octave)
+  }
+}
+
+impl fmt::Debug for Pitch {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    write!(f, "{}", self)
   }
 }
