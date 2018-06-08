@@ -58,8 +58,9 @@ fn main() {
 
   println!("Searching for freqs!");
 
-  let mut t = 0.0;
-  while t < 60.0 {
+  let duration = 10.0;
+  let mut t = 0.0f64;
+  while t < duration {
     for detected_pitch in ScaleScanner::new(&f, t) {
       println!("{}: {:?}", t, detected_pitch);
       notes.push(Note::new(detected_pitch.pitch, t, SCAN_TIME_RESOLUTION, detected_pitch.amplitude));
