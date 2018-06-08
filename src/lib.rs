@@ -2,6 +2,7 @@ extern crate byteorder;
 
 mod chord;
 pub mod constants;
+mod hz_scanner;
 mod note;
 mod pcm_file;
 mod pitch;
@@ -13,6 +14,7 @@ mod transform;
 pub mod util;
 
 pub use chord::Chord;
+pub use hz_scanner::HzScanner;
 pub use note::Note;
 pub use pcm_file::PCMFile;
 pub use pitch::Pitch;

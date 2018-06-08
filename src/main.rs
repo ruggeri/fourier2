@@ -6,7 +6,7 @@ extern crate rand;
 
 // sox -traw -r44100 -b16 -c2 -e signed -L samples.pcm samples.wav
 
-use fourier2::{constants::*, Note, PCMFile, ScaleScanner, SongIterator, util};
+use fourier2::{constants::*, HzScanner, Note, PCMFile, ScaleScanner, SongIterator, util};
 use rand::{
   distributions::Normal,
   prelude::*,
@@ -15,7 +15,7 @@ use std::fs::File;
 use std::io::BufWriter;
 
 fn main() {
-  let mut notes = vec![];
+  // let mut notes = vec![];
 
   // notes.extend(vec![
   //   Note::new("A.3".parse().unwrap(), 0.00, 1.00, 0.1),
@@ -58,12 +58,12 @@ fn main() {
 
   println!("Searching for freqs!");
 
-  let duration = 10.0;
+  let duration = 2.0;
   let mut t = 0.0f64;
   while t < duration {
-    for detected_pitch in ScaleScanner::new(&f, t) {
-      println!("{}: {:?}", t, detected_pitch);
-      notes.push(Note::new(detected_pitch.pitch, t, SCAN_TIME_RESOLUTION, detected_pitch.amplitude));
+    for detected_hz in HzScanner::new(&f, 200_f64, 300_f64, t) {
+      println!("{}: {:?}", t, detected_hz);
+      // notes.push(Note::new(detected_pitch.pitch, t, SCAN_TIME_RESOLUTION, detected_pitch.amplitude));
     }
 
     t += SCAN_TIME_RESOLUTION;
@@ -73,8 +73,8 @@ fn main() {
   // notes.push(Note::new("D#3".parse().unwrap(), 2.0_f64, 2.0_f64, 0.1));
   // notes.push(Note::new("G.3".parse().unwrap(), 4.0_f64, 2.0_f64, 0.1));
 
-  println!("Writing PCM output file!");
-  let mut file = File::create("./samples.pcm").unwrap();
-  let mut writer = BufWriter::new(file);
-  util::play_to_file(&mut writer, SongIterator::new(&notes));
+  // println!("Writing PCM output file!");
+  // let mut file = File::create("./samples.pcm").unwrap();
+  // let mut writer = BufWriter::new(file);
+  // util::play_to_file(&mut writer, SongIterator::new(&notes));
 }
