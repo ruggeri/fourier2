@@ -7,7 +7,7 @@ extern crate rand;
 // sox -traw -r44100 -b16 -c2 -e signed -L samples.pcm samples.wav
 
 use byteorder::{LittleEndian, WriteBytesExt};
-use fourier2::{constants::*, Note, ScaleScanner};
+use fourier2::{constants::*, Note, PCMFile, ScaleScanner, util};
 use rand::{
   distributions::Normal,
   prelude::*,
@@ -57,15 +57,22 @@ fn main() {
     Note::new("F.2".parse().unwrap(), 4.00, 1.00, 0.1),
   ]);
 
-  let dist = Normal::new(0.0_f64, 1.0_f64);
-  let f = |t| {
-    let noise = NOISE_LEVEL * dist.sample(&mut thread_rng());
-    Note::total_val(notes.iter(), t) + noise
-  };
+  // let dist = Normal::new(0.0_f64, 1.0_f64);
+  // let f = |t| {
+  //   let noise = NOISE_LEVEL * dist.sample(&mut thread_rng());
+  //   Note::total_val(notes.iter(), t) + noise
+  // };
 
-  println!("Writing PCM file!");
-  let mut file = File::create("./samples.pcm").unwrap();
-  play(&mut file, &f, 5.0);
+  // println!("Writing PCM file!");
+  // let mut file = File::create("./samples.pcm").unwrap();
+  // play(&mut file, &f, 5.0);
+
+  let file = PCMFile::open("./samples.pcm");
+
+  let f = |t| {
+    let idx = (t * SAMPLE_RATE) as usize;
+    util::i16_to_f64(file.i16s[idx])
+  };
 
   println!("Searching for freqs!");
 
