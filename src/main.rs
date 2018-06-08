@@ -20,6 +20,7 @@ fn play<F>(file: &mut File, f: &F, duration: f64)
   while t < duration {
     let val: f64 = f(t);
     file.write_i16::<LittleEndian>(fourier2::util::f64_to_i16(val)).unwrap();
+    file.write_i16::<LittleEndian>(fourier2::util::f64_to_i16(val)).unwrap();
 
     t += 1_f64 / SAMPLE_RATE;
   }
@@ -28,46 +29,38 @@ fn play<F>(file: &mut File, f: &F, duration: f64)
 fn main() {
   let mut notes = vec![];
 
-  notes.extend(vec![
-    Note::new("A.3".parse().unwrap(), 0.00, 1.00, 0.1),
-    Note::new("C.3".parse().unwrap(), 0.25, 0.75, 0.1),
-    Note::new("E.3".parse().unwrap(), 0.50, 0.50, 0.1),
-    Note::new("A.4".parse().unwrap(), 0.75, 0.25, 0.1),
-  ]);
+  // notes.extend(vec![
+  //   Note::new("A.3".parse().unwrap(), 0.00, 1.00, 0.1),
+  //   Note::new("C.3".parse().unwrap(), 0.25, 0.75, 0.1),
+  //   Note::new("E.3".parse().unwrap(), 0.50, 0.50, 0.1),
+  //   Note::new("A.4".parse().unwrap(), 0.75, 0.25, 0.1),
+  // ]);
 
-  notes.extend(vec![
-    Note::new("F.2".parse().unwrap(), 1.00, 1.00, 0.1),
-    Note::new("A.3".parse().unwrap(), 1.25, 0.75, 0.1),
-    Note::new("C.3".parse().unwrap(), 1.50, 0.50, 0.1),
-    Note::new("F.3".parse().unwrap(), 1.75, 0.25, 0.1),
-  ]);
+  // notes.extend(vec![
+  //   Note::new("F.2".parse().unwrap(), 1.00, 1.00, 0.1),
+  //   Note::new("A.3".parse().unwrap(), 1.25, 0.75, 0.1),
+  //   Note::new("C.3".parse().unwrap(), 1.50, 0.50, 0.1),
+  //   Note::new("F.3".parse().unwrap(), 1.75, 0.25, 0.1),
+  // ]);
 
-  notes.extend(vec![
-    Note::new("D.2".parse().unwrap(), 2.00, 1.00, 0.1),
-    Note::new("F.2".parse().unwrap(), 2.25, 0.75, 0.1),
-    Note::new("A.3".parse().unwrap(), 2.50, 0.50, 0.1),
-    Note::new("D.3".parse().unwrap(), 2.75, 0.25, 0.1),
-  ]);
+  // notes.extend(vec![
+  //   Note::new("D.2".parse().unwrap(), 2.00, 1.00, 0.1),
+  //   Note::new("F.2".parse().unwrap(), 2.25, 0.75, 0.1),
+  //   Note::new("A.3".parse().unwrap(), 2.50, 0.50, 0.1),
+  //   Note::new("D.3".parse().unwrap(), 2.75, 0.25, 0.1),
+  // ]);
 
-  notes.extend(vec![
-    Note::new("G.1".parse().unwrap(), 3.00, 2.00, 0.1),
-    Note::new("B.2".parse().unwrap(), 3.25, 1.75, 0.1),
-    Note::new("D.2".parse().unwrap(), 3.50, 1.50, 0.1),
-    Note::new("G.2".parse().unwrap(), 3.75, 0.25, 0.1),
-    Note::new("F.2".parse().unwrap(), 4.00, 1.00, 0.1),
-  ]);
+  // notes.extend(vec![
+  //   Note::new("G.1".parse().unwrap(), 3.00, 2.00, 0.1),
+  //   Note::new("B.2".parse().unwrap(), 3.25, 1.75, 0.1),
+  //   Note::new("D.2".parse().unwrap(), 3.50, 1.50, 0.1),
+  //   Note::new("G.2".parse().unwrap(), 3.75, 0.25, 0.1),
+  //   Note::new("F.2".parse().unwrap(), 4.00, 1.00, 0.1),
+  // ]);
 
   // let dist = Normal::new(0.0_f64, 1.0_f64);
-  // let f = |t| {
-  //   let noise = NOISE_LEVEL * dist.sample(&mut thread_rng());
-  //   Note::total_val(notes.iter(), t) + noise
-  // };
 
-  // println!("Writing PCM file!");
-  // let mut file = File::create("./samples.pcm").unwrap();
-  // play(&mut file, &f, 5.0);
-
-  let file = PCMFile::open("./samples.pcm");
+  let file = PCMFile::open("./rcar.pcm");
 
   let f = |t| {
     let idx = (t * SAMPLE_RATE) as usize;
@@ -76,12 +69,22 @@ fn main() {
 
   println!("Searching for freqs!");
 
-  let mut t = 0.125;
-  while t < 5.0 {
+  let mut t = 0.0;
+  while t < 60.0 {
     for detected_pitch in ScaleScanner::new(&f, t) {
       println!("{}: {:?}", t, detected_pitch);
+      notes.push(Note::new(detected_pitch.pitch, t, 0.25_f64, detected_pitch.amplitude));
     }
 
     t += 0.25;
   }
+
+  let f = |t| {
+    // let noise = NOISE_LEVEL * dist.sample(&mut thread_rng());
+    Note::total_val(notes.iter(), t)
+  };
+
+  println!("Writing PCM file!");
+  let mut file = File::create("./samples.pcm").unwrap();
+  play(&mut file, &f, 60.0);
 }
