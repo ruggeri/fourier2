@@ -1,13 +1,12 @@
 use constants::*;
-use scale;
 use transform::ftransform;
 use util;
 
-pub struct HzScanner<'a, F>
-  where F: Fn(f64) -> f64 + 'a {
+pub struct HzScanner<F>
+  where F: Fn(f64) -> f64 + Copy {
   hz: f64,
   end_hz: f64,
-  f: &'a F,
+  f: F,
   t: f64,
 }
 
@@ -15,11 +14,12 @@ pub struct HzScanner<'a, F>
 pub struct DetectedHz {
   pub hz: f64,
   pub amplitude: f64,
+  pub time: f64,
 }
 
-impl<'a, F> HzScanner<'a, F>
-  where F: Fn(f64) -> f64 + 'a {
-  pub fn new(f: &'a F, start_hz: f64, end_hz: f64, t: f64) -> HzScanner<'a, F> {
+impl<F> HzScanner<F>
+  where F: Fn(f64) -> f64 + Copy {
+  pub fn new(f: F, start_hz: f64, end_hz: f64, t: f64) -> HzScanner<F> {
     HzScanner {
       hz: start_hz,
       end_hz,
@@ -27,10 +27,18 @@ impl<'a, F> HzScanner<'a, F>
       t,
     }
   }
+
+  pub fn scan(f: F, start_hz: f64, end_hz: f64, start_t: f64, duration: f64) -> impl Iterator<Item=DetectedHz> {
+    let samples = (duration / SCAN_TIME_RESOLUTION) as usize;
+    (0..samples).flat_map(move |idx| {
+      let t = start_t + (idx as f64) * SCAN_TIME_RESOLUTION;
+      HzScanner::new(f, start_hz, end_hz, t)
+    })
+  }
 }
 
-impl<'a, F> Iterator for HzScanner<'a, F>
-  where F: Fn(f64) -> f64 + 'a {
+impl<F> Iterator for HzScanner<F>
+  where F: Fn(f64) -> f64 + Copy {
   type Item = DetectedHz;
 
   fn next(&mut self) -> Option<Self::Item> {
@@ -44,6 +52,7 @@ impl<'a, F> Iterator for HzScanner<'a, F>
         return Some(DetectedHz {
           hz,
           amplitude,
+          time: self.t,
         });
       }
     }

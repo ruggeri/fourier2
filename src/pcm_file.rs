@@ -2,6 +2,8 @@ use byteorder::{ByteOrder, LittleEndian};
 use std::fs::File;
 use std::io::prelude::*;
 use std::iter;
+use super::constants::*;
+use super::util;
 
 pub struct PCMFile {
   pub i16s: Vec<i16>,
@@ -24,5 +26,10 @@ impl PCMFile {
     }
 
     PCMFile { i16s: i16s_vec_1chan }
+  }
+
+  pub fn val(&self, t: f64) -> f64 {
+    let idx = (t * SAMPLE_RATE) as usize;
+    util::i16_to_f64(self.i16s[idx])
   }
 }

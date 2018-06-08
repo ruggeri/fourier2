@@ -6,75 +6,59 @@ extern crate rand;
 
 // sox -traw -r44100 -b16 -c2 -e signed -L samples.pcm samples.wav
 
-use fourier2::{constants::*, HzScanner, Note, PCMFile, ScaleScanner, SongIterator, util};
-use rand::{
-  distributions::Normal,
-  prelude::*,
+use fourier2::{
+  constants::*,
+  DetectedHz,
+  HzScanner,
+  Note,
+  PCMFile,
+  ScaleScanner,
+  SongIterator,
+  util
 };
-use std::fs::File;
-use std::io::BufWriter;
+
+const DURATION: f64 = 10.0_f64;
+const MIN_HZ: f64 = 200.0_f64;
+const MAX_HZ: f64 = 300.0_f64;
+
+fn _write_output(notes: &Vec<Note>) {
+  println!("Writing PCM output file!");
+  util::play_to_file("./samples.pcm", SongIterator::new(notes));
+}
+
+fn _scan_notes<F>(f: F) -> impl Iterator<Item=Note>
+  where F: Fn(f64) -> f64 + Copy {
+
+  println!("Searching for notes!");
+  ScaleScanner::scan(f, 0.0, DURATION).map(|detected_pitch| {
+    println!("t={:0.2} | {:?} | amp={:0.2}", detected_pitch.time, detected_pitch.pitch, detected_pitch.amplitude);
+    Note::new(
+      detected_pitch.pitch,
+      detected_pitch.time,
+      SCAN_TIME_RESOLUTION,
+      detected_pitch.amplitude
+    )
+  })
+}
+
+fn _scan_hz<F>(f: F) -> impl Iterator<Item=DetectedHz>
+  where F: Fn(f64) -> f64 + Copy {
+
+  println!("Searching for hz!");
+  HzScanner::scan(f, MIN_HZ, MAX_HZ, 0.0, DURATION).map(|detected_hz| {
+    println!("t={:0.2} | {:0.2}hz | amp={:0.4}", detected_hz.time, detected_hz.hz, detected_hz.amplitude);
+    detected_hz
+  })
+}
 
 fn main() {
-  // let mut notes = vec![];
-
-  // notes.extend(vec![
-  //   Note::new("A.3".parse().unwrap(), 0.00, 1.00, 0.1),
-  //   Note::new("C.3".parse().unwrap(), 0.25, 0.75, 0.1),
-  //   Note::new("E.3".parse().unwrap(), 0.50, 0.50, 0.1),
-  //   Note::new("A.4".parse().unwrap(), 0.75, 0.25, 0.1),
-  // ]);
-
-  // notes.extend(vec![
-  //   Note::new("F.2".parse().unwrap(), 1.00, 1.00, 0.1),
-  //   Note::new("A.3".parse().unwrap(), 1.25, 0.75, 0.1),
-  //   Note::new("C.3".parse().unwrap(), 1.50, 0.50, 0.1),
-  //   Note::new("F.3".parse().unwrap(), 1.75, 0.25, 0.1),
-  // ]);
-
-  // notes.extend(vec![
-  //   Note::new("D.2".parse().unwrap(), 2.00, 1.00, 0.1),
-  //   Note::new("F.2".parse().unwrap(), 2.25, 0.75, 0.1),
-  //   Note::new("A.3".parse().unwrap(), 2.50, 0.50, 0.1),
-  //   Note::new("D.3".parse().unwrap(), 2.75, 0.25, 0.1),
-  // ]);
-
-  // notes.extend(vec![
-  //   Note::new("G.1".parse().unwrap(), 3.00, 2.00, 0.1),
-  //   Note::new("B.2".parse().unwrap(), 3.25, 1.75, 0.1),
-  //   Note::new("D.2".parse().unwrap(), 3.50, 1.50, 0.1),
-  //   Note::new("G.2".parse().unwrap(), 3.75, 0.25, 0.1),
-  //   Note::new("F.2".parse().unwrap(), 4.00, 1.00, 0.1),
-  // ]);
-
-  // let dist = Normal::new(0.0_f64, 1.0_f64);
-
   println!("Reading PCM input file!");
   let file = PCMFile::open("./rcar.pcm");
 
-  let f = |t| {
-    let idx = (t * SAMPLE_RATE) as usize;
-    util::i16_to_f64(file.i16s[idx])
-  };
+  // for _ in _scan_hz(|t| file.val(t)) {
+  //   ; // Do nothing. Force evaluation.
+  // }
 
-  println!("Searching for freqs!");
-
-  let duration = 2.0;
-  let mut t = 0.0f64;
-  while t < duration {
-    for detected_hz in HzScanner::new(&f, 200_f64, 300_f64, t) {
-      println!("{}: {:?}", t, detected_hz);
-      // notes.push(Note::new(detected_pitch.pitch, t, SCAN_TIME_RESOLUTION, detected_pitch.amplitude));
-    }
-
-    t += SCAN_TIME_RESOLUTION;
-  }
-
-  // notes.push(Note::new("C.3".parse().unwrap(), 0.0_f64, 2.0_f64, 0.1));
-  // notes.push(Note::new("D#3".parse().unwrap(), 2.0_f64, 2.0_f64, 0.1));
-  // notes.push(Note::new("G.3".parse().unwrap(), 4.0_f64, 2.0_f64, 0.1));
-
-  // println!("Writing PCM output file!");
-  // let mut file = File::create("./samples.pcm").unwrap();
-  // let mut writer = BufWriter::new(file);
-  // util::play_to_file(&mut writer, SongIterator::new(&notes));
+  let notes = _scan_notes(|t| file.val(t)).collect::<Vec<Note>>();
+  _write_output(&notes);
 }

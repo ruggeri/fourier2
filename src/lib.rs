@@ -14,6 +14,7 @@ mod transform;
 pub mod util;
 
 pub use chord::Chord;
+pub use hz_scanner::DetectedHz;
 pub use hz_scanner::HzScanner;
 pub use note::Note;
 pub use pcm_file::PCMFile;
