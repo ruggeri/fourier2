@@ -29,7 +29,7 @@ pub fn play_to_file<Iter>(writer: &mut Write, vals: Iter)
   where Iter: Iterator<Item=f64> {
 
   for val in vals {
-    writer.write_i16::<LittleEndian>(f64_to_i16(val)).unwrap();
-    writer.write_i16::<LittleEndian>(f64_to_i16(val)).unwrap();
+    writer.write_i16::<LittleEndian>(f64_to_i16(val * 2_f64)).unwrap();
+    writer.write_i16::<LittleEndian>(f64_to_i16(val * 2_f64)).unwrap();
   }
 }
