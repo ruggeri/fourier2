@@ -17,11 +17,20 @@ pub fn scale_for_octave(octave: i32) -> Vec<Pitch> {
   ]
 }
 
-pub fn piano_pitches() -> Vec<Pitch> {
-  let mut pitches: Vec<Pitch> = Vec::new();
-  for octave in 0..8 {
-    pitches.extend(scale_for_octave(octave));
-  }
+static mut _PPS_OPTION: Option<Vec<Pitch>> = None;
 
-  pitches
+pub fn piano_pitches() -> &'static Vec<Pitch> {
+  unsafe {
+    if let Some(ref pps) = _PPS_OPTION {
+      return pps;
+    }
+
+    let mut pps: Vec<Pitch> = Vec::new();
+    for octave in 0..8 {
+      pps.extend(scale_for_octave(octave));
+    }
+
+    _PPS_OPTION = Some(pps);
+    piano_pitches()
+  }
 }
