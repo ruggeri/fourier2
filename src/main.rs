@@ -7,7 +7,7 @@ extern crate fourier2;
 
 use byteorder::{LittleEndian, WriteBytesExt};
 use std::fs::File;
-use fourier2::{Note, scale};
+use fourier2::{Note, ScaleScanner};
 
 fn play<F>(file: &mut File, f: &F, duration: f64)
   where F: Fn(f64) -> f64 {
@@ -64,7 +64,9 @@ fn main() {
 
   let mut t = 0.125;
   while t < 5.0 {
-    println!("{}: {:?}", t, scale::scan(&f, t));
+    for detected_pitch in ScaleScanner::new(&f, t) {
+      println!("{}: {:?}", t, detected_pitch);
+    }
 
     t += 0.25;
   }

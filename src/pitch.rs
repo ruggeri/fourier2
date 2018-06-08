@@ -3,6 +3,7 @@ use std::fmt;
 use std::str::FromStr;
 use util;
 
+#[derive(Clone, Copy)]
 pub struct Pitch {
   pitch_class: PitchClass,
   sharp: bool,

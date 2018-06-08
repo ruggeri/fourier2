@@ -1,7 +1,7 @@
 use std::fmt;
 use std::str::FromStr;
 
-#[derive(Debug)]
+#[derive(Clone, Copy, Debug)]
 pub enum PitchClass {
   A,
   B,
