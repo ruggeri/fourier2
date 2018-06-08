@@ -17,6 +17,7 @@ impl Note {
     }
   }
 
+  // TODO: Can optimize significantly if notes are in sorted order.
   pub fn total_val<'a, T: Iterator<Item=&'a Note>>(notes: T, t: f64) -> f64 {
     let mut val = 0.0;
     for note in notes {
