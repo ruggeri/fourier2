@@ -13,8 +13,8 @@ pub struct ScaleScanner<'a, F>
 
 #[derive(Debug)]
 pub struct DetectedPitch {
-  pitch: Pitch,
-  amplitude: f64,
+  pub pitch: Pitch,
+  pub amplitude: f64,
 }
 
 impl<'a, F> ScaleScanner<'a, F>
