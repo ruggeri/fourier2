@@ -1,4 +1,6 @@
+use byteorder::{LittleEndian, WriteBytesExt};
 use std::f64;
+use std::fs::File;
 use std::i16;
 
 pub fn sin_val_for_freq_at_time(freq: f64, t: f64) -> f64 {
@@ -21,4 +23,13 @@ pub fn f64_to_i16(val: f64) -> i16 {
 
 pub fn amplitude(coeffs: (f64, f64)) -> f64 {
   (coeffs.0.powf(2.0_f64) + coeffs.1.powf(2.0_f64)).sqrt()
+}
+
+pub fn play_to_file<Iter>(file: &mut File, vals: Iter)
+  where Iter: Iterator<Item=f64> {
+
+  for val in vals {
+    file.write_i16::<LittleEndian>(f64_to_i16(val)).unwrap();
+    file.write_i16::<LittleEndian>(f64_to_i16(val)).unwrap();
+  }
 }

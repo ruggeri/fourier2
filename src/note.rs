@@ -1,10 +1,10 @@
 use pitch::Pitch;
 
 pub struct Note {
-  pitch: Pitch,
-  start_time: f64,
-  end_time: f64,
-  amplitude: f64,
+  pub pitch: Pitch,
+  pub start_time: f64,
+  pub end_time: f64,
+  pub amplitude: f64,
 }
 
 impl Note {
@@ -15,16 +15,6 @@ impl Note {
       end_time: start_time + duration,
       amplitude,
     }
-  }
-
-  // TODO: Can optimize significantly if notes are in sorted order.
-  pub fn total_val<'a, T: Iterator<Item=&'a Note>>(notes: T, t: f64) -> f64 {
-    let mut val = 0.0;
-    for note in notes {
-      val += note.val(t);
-    }
-
-    val
   }
 
   pub fn val(&self, t: f64) -> f64 {

@@ -6,25 +6,13 @@ extern crate rand;
 
 // sox -traw -r44100 -b16 -c2 -e signed -L samples.pcm samples.wav
 
-use byteorder::{LittleEndian, WriteBytesExt};
-use fourier2::{constants::*, Note, PCMFile, ScaleScanner, util};
+use fourier2::{constants::*, Note, PCMFile, ScaleScanner, SongIterator, util};
 use rand::{
   distributions::Normal,
   prelude::*,
 };
 use std::fs::File;
 
-fn play<F>(file: &mut File, f: &F, duration: f64)
-  where F: Fn(f64) -> f64 {
-  let mut t = 0.0;
-  while t < duration {
-    let val: f64 = f(t);
-    file.write_i16::<LittleEndian>(fourier2::util::f64_to_i16(val)).unwrap();
-    file.write_i16::<LittleEndian>(fourier2::util::f64_to_i16(val)).unwrap();
-
-    t += 1_f64 / SAMPLE_RATE;
-  }
-}
 
 fn main() {
   let mut notes = vec![];
@@ -60,6 +48,7 @@ fn main() {
 
   // let dist = Normal::new(0.0_f64, 1.0_f64);
 
+  println!("Reading PCM input file!");
   let file = PCMFile::open("./rcar.pcm");
 
   let f = |t| {
@@ -73,18 +62,13 @@ fn main() {
   while t < 60.0 {
     for detected_pitch in ScaleScanner::new(&f, t) {
       println!("{}: {:?}", t, detected_pitch);
-      notes.push(Note::new(detected_pitch.pitch, t, 0.25_f64, detected_pitch.amplitude));
+      notes.push(Note::new(detected_pitch.pitch, t, SCAN_TIME_RESOLUTION, detected_pitch.amplitude));
     }
 
-    t += 0.25;
+    t += SCAN_TIME_RESOLUTION;
   }
 
-  let f = |t| {
-    // let noise = NOISE_LEVEL * dist.sample(&mut thread_rng());
-    Note::total_val(notes.iter(), t)
-  };
-
-  println!("Writing PCM file!");
+  println!("Writing PCM output file!");
   let mut file = File::create("./samples.pcm").unwrap();
-  play(&mut file, &f, 60.0);
+  util::play_to_file(&mut file, SongIterator::new(&notes));
 }
