@@ -2,12 +2,17 @@
 
 extern crate byteorder;
 extern crate fourier2;
+extern crate rand;
 
 // sox -traw -r44100 -b16 -c2 -e signed -L samples.pcm samples.wav
 
 use byteorder::{LittleEndian, WriteBytesExt};
+use fourier2::{constants::*, Note, ScaleScanner};
+use rand::{
+  distributions::Normal,
+  prelude::*,
+};
 use std::fs::File;
-use fourier2::{Note, ScaleScanner};
 
 fn play<F>(file: &mut File, f: &F, duration: f64)
   where F: Fn(f64) -> f64 {
@@ -16,7 +21,7 @@ fn play<F>(file: &mut File, f: &F, duration: f64)
     let val: f64 = f(t);
     file.write_i16::<LittleEndian>(fourier2::util::f64_to_i16(val)).unwrap();
 
-    t += 1_f64 / fourier2::constants::SAMPLE_RATE;
+    t += 1_f64 / SAMPLE_RATE;
   }
 }
 
@@ -52,8 +57,10 @@ fn main() {
     Note::new("F.2".parse().unwrap(), 4.00, 1.00, 0.1),
   ]);
 
+  let dist = Normal::new(0.0_f64, 1.0_f64);
   let f = |t| {
-    Note::total_val(notes.iter(), t)
+    let noise = NOISE_LEVEL * dist.sample(&mut thread_rng());
+    Note::total_val(notes.iter(), t) + noise
   };
 
   println!("Writing PCM file!");
