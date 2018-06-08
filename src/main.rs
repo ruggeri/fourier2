@@ -12,7 +12,7 @@ use rand::{
   prelude::*,
 };
 use std::fs::File;
-
+use std::io::BufWriter;
 
 fn main() {
   let mut notes = vec![];
@@ -69,7 +69,12 @@ fn main() {
     t += SCAN_TIME_RESOLUTION;
   }
 
+  // notes.push(Note::new("C.3".parse().unwrap(), 0.0_f64, 2.0_f64, 0.1));
+  // notes.push(Note::new("D#3".parse().unwrap(), 2.0_f64, 2.0_f64, 0.1));
+  // notes.push(Note::new("G.3".parse().unwrap(), 4.0_f64, 2.0_f64, 0.1));
+
   println!("Writing PCM output file!");
   let mut file = File::create("./samples.pcm").unwrap();
-  util::play_to_file(&mut file, SongIterator::new(&notes));
+  let mut writer = BufWriter::new(file);
+  util::play_to_file(&mut writer, SongIterator::new(&notes));
 }
