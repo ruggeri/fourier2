@@ -1,5 +1,4 @@
-samples.pcm
-samples.wav
+/outputs
 
 /target
 **/*.rs.bk

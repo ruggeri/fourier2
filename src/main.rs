@@ -23,7 +23,7 @@ const MAX_HZ: f64 = 300.0_f64;
 
 fn _write_output(notes: &Vec<Note>) {
   println!("Writing PCM output file!");
-  util::play_to_file("./samples.pcm", SongIterator::new(notes));
+  util::play_to_file("./outputs/samples.pcm", SongIterator::new(notes));
 }
 
 fn _scan_notes<F>(f: F) -> impl Iterator<Item=Note>
@@ -53,7 +53,7 @@ fn _scan_hz<F>(f: F) -> impl Iterator<Item=DetectedHz>
 
 fn main() {
   println!("Reading PCM input file!");
-  let file = PCMFile::open("./rcar.pcm");
+  let file = PCMFile::open("./outputs/rcar.pcm");
 
   // for _ in _scan_hz(|t| file.val(t)) {
   //   ; // Do nothing. Force evaluation.
