@@ -43,8 +43,7 @@ impl<'a, F> Iterator for ScaleScanner<'a, F>
 
   fn next(&mut self) -> Option<Self::Item> {
     while let Some(&pitch) = self.piano_pitches.next() {
-      let hz = pitch.freq();
-      let coeffs = ftransform(hz as f64, self.f, self.t);
+      let coeffs = ftransform(pitch.hz as f64, self.f, self.t);
       let amplitude = util::amplitude(coeffs);
       if amplitude > SCAN_THRESHOLD {
         return Some(DetectedPitch {

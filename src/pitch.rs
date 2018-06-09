@@ -5,26 +5,36 @@ use util;
 
 #[derive(Clone, Copy)]
 pub struct Pitch {
-  pitch_class: PitchClass,
-  sharp: bool,
-  octave: i32,
+  pub pitch_class: PitchClass,
+  pub sharp: bool,
+  pub octave: i32,
+  pub hz: f64,
+}
+
+fn hz(pitch_class: PitchClass, sharp: bool, octave: i32) -> f64 {
+  let mut hz: f64 = pitch_class.base_freq();
+
+  if sharp {
+    hz *= (2.0_f64).powf(1.0 / 12.0);
+  }
+
+  hz *= (2.0_f64).powf((octave - 4) as f64);
+
+  hz
 }
 
 impl Pitch {
-  pub fn freq(&self) -> f64 {
-    let mut f: f64 = self.pitch_class.base_freq();
-
-    if self.sharp {
-      f *= (2.0_f64).powf(1.0 / 12.0);
+  pub fn new(pitch_class: PitchClass, sharp: bool, octave: i32) -> Pitch {
+    Pitch {
+      pitch_class,
+      sharp,
+      octave,
+      hz: hz(pitch_class, sharp, octave),
     }
-
-    f *= (2.0_f64).powf((self.octave - 4) as f64);
-
-    f
   }
 
   pub fn val(&self, t: f64) -> f64 {
-    util::sin_val_for_freq_at_time(self.freq(), t)
+    util::sin_val_for_freq_at_time(self.hz, t)
   }
 }
 
@@ -61,11 +71,7 @@ impl FromStr for Pitch {
       Err(_) => { return Err(OctaveParseFailed); },
     };
 
-    Ok(Pitch {
-      pitch_class,
-      sharp,
-      octave,
-    })
+    Ok(Pitch::new(pitch_class, sharp, octave))
   }
 }
 

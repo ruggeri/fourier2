@@ -31,7 +31,7 @@ fn _scan_notes<F>(f: F) -> impl Iterator<Item=Note>
 
   println!("Searching for notes!");
   ScaleScanner::scan(f, 0.0, DURATION).map(|detected_pitch| {
-    println!("t={:0.2} | {:?} | amp={:0.2}", detected_pitch.time, detected_pitch.pitch, detected_pitch.amplitude);
+    println!("t={:0.2} | {:?} | amp={:0.4}", detected_pitch.time, detected_pitch.pitch, detected_pitch.amplitude);
     Note::new(
       detected_pitch.pitch,
       detected_pitch.time,
