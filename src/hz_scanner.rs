@@ -48,7 +48,7 @@ impl<F> Iterator for HzScanner<F>
 
       let coeffs = ftransform(hz, self.f, self.t);
       let amplitude = util::amplitude(coeffs);
-      if amplitude > SCAN_THRESHOLD {
+      if amplitude > SCAN_AMPLITUDE_THRESHOLD {
         return Some(DetectedHz {
           hz,
           amplitude,
