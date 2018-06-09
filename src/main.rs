@@ -18,8 +18,8 @@ use fourier2::{
   util
 };
 
-const MIN_HZ: f64 = 200.0_f64;
-const MAX_HZ: f64 = 300.0_f64;
+const _MIN_HZ: f64 = 200.0_f64;
+const _MAX_HZ: f64 = 300.0_f64;
 
 fn _write_output(notes: &Vec<Note>) {
   println!("Writing PCM output file!");
@@ -45,7 +45,7 @@ fn _scan_notes<'a>(file: &'a PCMFile) -> impl Iterator<Item=Note> + 'a {
 fn _scan_hz<'a>(file: &'a PCMFile) -> impl Iterator<Item=DetectedHz> + 'a {
 
   println!("Searching for hz!");
-  HzScanner::scan(move |t| file.val(t), MIN_HZ, MAX_HZ, 0.0, file.duration()).map(|detected_hz| {
+  HzScanner::scan(move |t| file.val(t), _MIN_HZ, _MAX_HZ, 0.0, file.duration()).map(|detected_hz| {
     println!("t={:0.2} | {:0.2}hz | amp={:0.4}", detected_hz.time, detected_hz.hz, detected_hz.amplitude);
     detected_hz
   })
