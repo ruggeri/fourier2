@@ -32,4 +32,8 @@ impl PCMFile {
     let idx = (t * SAMPLE_RATE) as usize;
     util::i16_to_f64(self.i16s[idx])
   }
+
+  pub fn duration(&self) -> f64 {
+    (self.i16s.len() as f64) / SAMPLE_RATE
+  }
 }
