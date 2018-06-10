@@ -14,9 +14,8 @@ use fourier2::{
   core::*,
   hz_scanner::*,
   scale_scanner::*,
-  util,
+  util::{self, PCMFile},
 
-  PCMFile,
   SmoothablePitchIterator,
 };
 

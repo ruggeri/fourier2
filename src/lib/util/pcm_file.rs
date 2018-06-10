@@ -2,8 +2,8 @@ use byteorder::{ByteOrder, LittleEndian};
 use std::fs::File;
 use std::io::prelude::*;
 use std::iter;
-use super::constants::*;
-use super::util;
+use ::constants::*;
+use ::util;
 
 pub struct PCMFile {
   pub i16s: Vec<i16>,
