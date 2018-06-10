@@ -1,12 +1,20 @@
 use constants::*;
 use util;
 
-pub fn ftransform<F>(freq: f64, fun: F, window_center: f64) -> (f64, f64)
+#[derive(Builder, Clone, Copy)]
+pub struct FourierTransformOpts {
+  #[builder(default = "FOURIER_WINDOW_WIDTH")]
+  pub window_width: f64,
+  #[builder(default = "FOURIER_SAMPLE_RATE_PER_SEC")]
+  pub sample_rate_per_sec: f64,
+}
+
+pub fn ftransform<F>(freq: f64, fun: F, window_center: f64, opts: FourierTransformOpts) -> (f64, f64)
   where F: Fn(f64) -> f64 {
-  let start = (window_center - FOURIER_WINDOW_WIDTH).max(0.0_f64);
+  let start = (window_center - opts.window_width).max(0.0_f64);
   let end = window_center + (window_center - start);
   let total_width = end - start;
-  let num_samples = total_width * FOURIER_SAMPLE_RATE_PER_SEC;
+  let num_samples = total_width * opts.sample_rate_per_sec;
 
   let mut sin_amplitude = 0.0_f64;
   let mut cos_amplitude = 0.0_f64;

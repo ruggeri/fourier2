@@ -13,10 +13,14 @@ use fourier2::{
   constants::*,
   DetectedHz,
   DetectedPitch,
+  HzScannerOpts,
+  HzScannerOptsBuilder,
   HzScanner,
   Note,
   PCMFile,
   ScaleScanner,
+  ScaleScannerOpts,
+  ScaleScannerOptsBuilder,
   SmoothablePitchIterator,
   SongIterator,
   util
@@ -30,11 +34,11 @@ fn _write_output(notes: &Vec<Note>, output_fname: &str) {
   util::play_to_file(output_fname, SongIterator::new(notes));
 }
 
-fn _scan_notes<'a>(file: &'a PCMFile, do_smooth: bool, scan_smoothing_ratio: f64) -> impl Iterator<Item=Note> + 'a {
+fn _scan_notes<'a>(file: &'a PCMFile, do_smooth: bool, scan_smoothing_ratio: f64, scan_opts: ScaleScannerOpts) -> impl Iterator<Item=Note> + 'a {
 
   println!("Searching for notes!");
   let mut iter: Box<Iterator<Item=DetectedPitch>>;
-  iter = Box::new(ScaleScanner::scan(move |t| file.val(t), 0.0, file.duration()));
+  iter = Box::new(ScaleScanner::scan(move |t| file.val(t), 0.0, file.duration(), scan_opts));
 
   if do_smooth {
     iter = Box::new(iter.smooth(scan_smoothing_ratio));
@@ -53,10 +57,10 @@ fn _scan_notes<'a>(file: &'a PCMFile, do_smooth: bool, scan_smoothing_ratio: f64
   iter
 }
 
-fn _scan_hz<'a>(file: &'a PCMFile) -> impl Iterator<Item=DetectedHz> + 'a {
+fn _scan_hz<'a>(file: &'a PCMFile, opts: HzScannerOpts) -> impl Iterator<Item=DetectedHz> + 'a {
 
   println!("Searching for hz!");
-  HzScanner::scan(move |t| file.val(t), _MIN_HZ, _MAX_HZ, 0.0, file.duration()).map(|detected_hz| {
+  HzScanner::scan(move |t| file.val(t), 0.0, file.duration(), opts).map(|detected_hz| {
     println!("t={:0.2} | {:0.2}hz | amp={:0.4}", detected_hz.time, detected_hz.hz, detected_hz.amplitude);
     detected_hz
   })
@@ -72,6 +76,9 @@ fn main() {
       .takes_value(true)
       .requires("smooth")
       .help("notes at less than x% of max note amplitude are dropped"))
+    .arg(Arg::with_name("scan_time_resolution")
+      .long("scan-time-resolution")
+      .takes_value(true))
     .arg(Arg::with_name("INPUT")
       .help("Input PCM file")
       .required(true)
@@ -86,9 +93,7 @@ fn main() {
   let output_fname = &matches.value_of("OUTPUT").unwrap();
   let do_smooth = matches.is_present("smooth");
   let scan_smoothing_ratio = if matches.is_present("smoothing-ratio") {
-    value_t!(matches.value_of("smoothing-ratio"), f64).unwrap_or_else(|e| {
-      e.exit();
-    })
+    value_t!(matches, "smoothing-ratio", f64).unwrap_or_else(|e| e.exit())
   } else {
     SCAN_SMOOTHING_RATIO
   };
@@ -100,6 +105,18 @@ fn main() {
   //   ; // Do nothing. Force evaluation.
   // }
 
-  let notes = _scan_notes(&file, do_smooth, scan_smoothing_ratio).collect::<Vec<Note>>();
+  let mut scale_scan_opts_builder = ScaleScannerOptsBuilder::default();
+  let mut hz_scan_opts_builder = HzScannerOptsBuilder::default();
+  hz_scan_opts_builder.start_hz(_MIN_HZ).end_hz(_MAX_HZ);
+
+  if matches.is_present("scan_time_resolution") {
+    let scan_time_resolution = value_t!(matches, "scan_time_resolution", f64).unwrap_or_else(|e| e.exit());
+    scale_scan_opts_builder.scan_time_resolution(scan_time_resolution);
+    hz_scan_opts_builder.scan_time_resolution(scan_time_resolution);
+  }
+  let scale_scan_opts = scale_scan_opts_builder.build().unwrap();
+  let hz_scan_opts = hz_scan_opts_builder.build().unwrap();
+
+  let notes = _scan_notes(&file, do_smooth, scan_smoothing_ratio, scale_scan_opts).collect::<Vec<Note>>();
   _write_output(&notes, output_fname);
 }
