@@ -1,3 +1,5 @@
+#![allow(unknown_lints)]
+
 use scale_scanner::DetectedPitch;
 use std::iter::Peekable;
 
@@ -37,6 +39,7 @@ where
         let mut group = vec![];
         loop {
             if let Some(item) = self.iter.peek() {
+                #[allow(float_cmp)]
                 match time {
                     Some(t) if t != item.time => {
                         break;
@@ -51,7 +54,7 @@ where
         }
 
         // println!("{:?}", group);
-        if group.len() == 0 {
+        if group.is_empty() {
             return None;
         }
 

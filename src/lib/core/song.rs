@@ -2,14 +2,14 @@ use super::note::Note;
 use constants::*;
 
 pub struct SongIterator<'a> {
-    notes: &'a Vec<Note>,
+    notes: &'a [Note],
     note_start_idx: usize,
     t: f64,
     dt: f64,
 }
 
 impl<'a> SongIterator<'a> {
-    pub fn new(notes: &'a Vec<Note>) -> SongIterator<'a> {
+    pub fn new(notes: &'a [Note]) -> SongIterator<'a> {
         SongIterator {
             notes,
             note_start_idx: 0,

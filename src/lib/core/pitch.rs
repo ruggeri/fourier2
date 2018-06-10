@@ -18,7 +18,7 @@ fn hz(pitch_class: PitchClass, sharp: bool, octave: i32) -> f64 {
         hz *= (2.0_f64).powf(1.0 / 12.0);
     }
 
-    hz *= (2.0_f64).powf((octave - 4) as f64);
+    hz *= (2.0_f64).powf(f64::from(octave - 4));
 
     hz
 }

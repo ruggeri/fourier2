@@ -28,7 +28,7 @@ impl PitchClass {
     }
 
     pub fn base_freq(&self) -> f64 {
-        440.0 * (2.0_f64).powf(self.semitones_above_a() as f64 / 12.0)
+        440.0 * (2.0_f64).powf(f64::from(self.semitones_above_a()) / 12.0)
     }
 }
 

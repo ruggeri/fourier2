@@ -19,7 +19,7 @@ pub fn scan_notes<'a>(
         iter = Box::new(iter.smooth(scan_smoothing_ratio));
     }
 
-    let iter = iter.map(move |detected_pitch| {
+    iter.map(move |detected_pitch| {
         println!(
             "t={:0.2} | {:?} | amp={:0.4}",
             detected_pitch.time, detected_pitch.pitch, detected_pitch.amplitude
@@ -31,7 +31,5 @@ pub fn scan_notes<'a>(
             scan_opts.scan_time_resolution,
             detected_pitch.amplitude,
         )
-    });
-
-    iter
+    })
 }

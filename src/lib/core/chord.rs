@@ -18,9 +18,7 @@ impl Chord {
     }
 
     pub fn val(&self, t: f64) -> f64 {
-        if t < self.start_time {
-            return 0.0;
-        } else if self.end_time < t {
+        if t < self.start_time || self.end_time < t {
             return 0.0;
         }
 
