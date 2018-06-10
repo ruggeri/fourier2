@@ -8,7 +8,8 @@ extern crate rand;
 
 // sox -traw -r44100 -b16 -c2 -e signed -L samples.pcm samples.wav
 
-use clap::{Arg, App};
+mod args;
+
 use fourier2::{
   constants::*,
   core::*,
@@ -59,27 +60,7 @@ fn _scan_hz<'a>(file: &'a PCMFile, opts: HzScannerOpts) -> impl Iterator<Item=De
 }
 
 fn main() {
-  let matches = App::new("fourier2")
-    .arg(Arg::with_name("smooth")
-      .long("smooth")
-      .help("should smoothing be used?"))
-    .arg(Arg::with_name("smoothing-ratio")
-      .long("smoothing-ratio")
-      .takes_value(true)
-      .requires("smooth")
-      .help("notes at less than x% of max note amplitude are dropped"))
-    .arg(Arg::with_name("scan_time_resolution")
-      .long("scan-time-resolution")
-      .takes_value(true))
-    .arg(Arg::with_name("INPUT")
-      .help("Input PCM file")
-      .required(true)
-      .index(1))
-    .arg(Arg::with_name("OUTPUT")
-      .help("Output PCM file name")
-      .required(true)
-      .index(2))
-    .get_matches();
+  let matches = args::matches();
 
   let input_fname = &matches.value_of("INPUT").unwrap();
   let output_fname = &matches.value_of("OUTPUT").unwrap();
