@@ -11,19 +11,13 @@ extern crate rand;
 use clap::{Arg, App};
 use fourier2::{
   constants::*,
-  DetectedHz,
-  DetectedPitch,
-  HzScannerOpts,
-  HzScannerOptsBuilder,
-  HzScanner,
-  Note,
+  core::*,
+  hz_scanner::*,
+  scale_scanner::*,
+  util,
+
   PCMFile,
-  ScaleScanner,
-  ScaleScannerOpts,
-  ScaleScannerOptsBuilder,
   SmoothablePitchIterator,
-  SongIterator,
-  util
 };
 
 const _MIN_HZ: f64 = 200.0_f64;

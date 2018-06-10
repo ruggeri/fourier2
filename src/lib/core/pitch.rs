@@ -1,4 +1,4 @@
-use pitch_class::{PitchClass, PitchClassParseErr};
+use super::pitch_class::{PitchClass, PitchClassParseErr};
 use std::fmt;
 use std::str::FromStr;
 use util;

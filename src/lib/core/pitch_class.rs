@@ -12,7 +12,7 @@ pub enum PitchClass {
   G,
 }
 
-use PitchClass::*;
+use self::PitchClass::*;
 
 impl PitchClass {
   pub fn semitones_above_a(&self) -> i32 {

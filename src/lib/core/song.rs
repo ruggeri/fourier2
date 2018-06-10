@@ -1,5 +1,5 @@
 use constants::*;
-use note::Note;
+use super::note::Note;
 
 pub struct SongIterator<'a> {
   notes: &'a Vec<Note>,

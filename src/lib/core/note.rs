@@ -1,4 +1,4 @@
-use pitch::Pitch;
+use super::pitch::Pitch;
 
 pub struct Note {
   pub pitch: Pitch,

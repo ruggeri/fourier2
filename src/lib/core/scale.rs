@@ -1,4 +1,4 @@
-use pitch::Pitch;
+use super::pitch::Pitch;
 
 pub fn scale_for_octave(octave: i32) -> Vec<Pitch> {
   vec![

@@ -1,7 +1,6 @@
 use constants::*;
+use ::core::{self, Pitch};
 use super::opts::ScaleScannerOpts;
-use pitch::Pitch;
-use scale;
 use transform::{FourierTransformOpts, ftransform};
 use util;
 
@@ -24,7 +23,7 @@ impl<'a, F> ScaleScanner<'a, F>
   where F: Fn(f64) -> f64 + Copy {
   pub fn new(f: F, t: f64, opts: ScaleScannerOpts) -> ScaleScanner<'a, F> {
     ScaleScanner {
-      piano_pitches: scale::piano_pitches().iter(),
+      piano_pitches: core::piano_pitches().iter(),
       f,
       t,
       opts,
