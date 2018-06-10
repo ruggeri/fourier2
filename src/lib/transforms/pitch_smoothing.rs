@@ -1,5 +1,5 @@
 use std::iter::Peekable;
-use super::scale_scanner::DetectedPitch;
+use ::scale_scanner::DetectedPitch;
 
 // TODO: THIS CODE IS AN ABOMINATION.
 

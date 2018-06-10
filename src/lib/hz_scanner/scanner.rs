@@ -1,6 +1,6 @@
 use constants::*;
 use super::opts::HzScannerOpts;
-use transform::{FourierTransformOpts, ftransform};
+use ::transforms::{FourierTransformOpts, ftransform};
 use util;
 
 pub struct HzScanner<F>

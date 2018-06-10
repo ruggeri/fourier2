@@ -1,7 +1,7 @@
 use constants::*;
 use ::core::{self, Pitch};
 use super::opts::ScaleScannerOpts;
-use transform::{FourierTransformOpts, ftransform};
+use ::transforms::{FourierTransformOpts, ftransform};
 use util;
 
 pub struct ScaleScanner<'a, F>

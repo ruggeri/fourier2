@@ -1,5 +1,5 @@
-use constants::*;
-use util;
+use ::constants::*;
+use ::util;
 
 #[derive(Builder, Clone, Copy)]
 pub struct FourierTransformOpts {

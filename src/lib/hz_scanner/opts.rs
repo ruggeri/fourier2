@@ -1,5 +1,5 @@
 use constants::*;
-use transform::{FourierTransformOpts, FourierTransformOptsBuilder};
+use ::transforms::{FourierTransformOpts, FourierTransformOptsBuilder};
 
 #[derive(Builder, Clone, Copy)]
 pub struct HzScannerOpts {

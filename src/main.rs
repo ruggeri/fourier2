@@ -14,9 +14,8 @@ use fourier2::{
   core::*,
   hz_scanner::*,
   scale_scanner::*,
+  transforms::SmoothablePitchIterator,
   util::{self, PCMFile},
-
-  SmoothablePitchIterator,
 };
 
 const _MIN_HZ: f64 = 200.0_f64;
