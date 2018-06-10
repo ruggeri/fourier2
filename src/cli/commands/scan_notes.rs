@@ -1,10 +1,14 @@
-use fourier2::{core::*, scale_scanner::*, transforms::SmoothablePitchIterator, util::PCMFile};
+use fourier2::{
+    core::*,
+    scale_scanner::*,
+    transforms::{PitchSmoothingOpts, SmoothablePitchIterator},
+    util::PCMFile,
+};
 
 pub fn scan_notes<'a>(
     file: &'a PCMFile,
-    do_smooth: bool,
-    scan_smoothing_ratio: f64,
     scan_opts: ScaleScannerOpts,
+    smoothing_opts: Option<PitchSmoothingOpts>,
 ) -> impl Iterator<Item = Note> + 'a {
     println!("Searching for notes!");
     let mut iter: Box<Iterator<Item = DetectedPitch>>;
@@ -15,8 +19,8 @@ pub fn scan_notes<'a>(
         scan_opts,
     ));
 
-    if do_smooth {
-        iter = Box::new(iter.smooth(scan_smoothing_ratio));
+    if let Some(smoothing_opts) = smoothing_opts {
+        iter = Box::new(iter.smooth(smoothing_opts));
     }
 
     iter.map(move |detected_pitch| {

@@ -1,9 +1,9 @@
 use clap::ArgMatches;
 use constants::*;
 use fourier2::{
-    self,
     hz_scanner::{HzScannerOpts, HzScannerOptsBuilder},
     scale_scanner::{ScaleScannerOpts, ScaleScannerOptsBuilder},
+    transforms::{PitchSmoothingOpts, PitchSmoothingOptsBuilder},
 };
 
 pub enum Mode {
@@ -15,9 +15,6 @@ pub struct Config<'a> {
     pub mode: Mode,
     pub input_fname: &'a str,
     pub output_fname: &'a str,
-    pub do_smooth: bool,
-    // TODO: This doesn't belong here!
-    pub scan_smoothing_ratio: f64,
 }
 
 use self::Mode::*;
@@ -30,18 +27,10 @@ impl<'a> Config<'a> {
             _ => unreachable!(),
         };
 
-        let scan_smoothing_ratio = if matches.is_present("smoothing-ratio") {
-            value_t!(matches, "smoothing-ratio", f64).unwrap_or_else(|e| e.exit())
-        } else {
-            fourier2::constants::SCAN_SMOOTHING_RATIO
-        };
-
         Config {
             mode,
             input_fname: matches.value_of("INPUT").unwrap(),
             output_fname: matches.value_of("OUTPUT").unwrap(),
-            do_smooth: matches.is_present("smooth"),
-            scan_smoothing_ratio,
         }
     }
 }
@@ -67,4 +56,20 @@ pub fn scale_scanner_opts<'a>(matches: &'a ArgMatches<'a>) -> ScaleScannerOpts {
         scale_scan_opts_builder.scan_time_resolution(scan_time_resolution);
     }
     scale_scan_opts_builder.build().unwrap()
+}
+
+pub fn scan_smoothing_opts<'a>(matches: &'a ArgMatches<'a>) -> Option<PitchSmoothingOpts> {
+    if !matches.is_present("smooth") {
+        return None;
+    }
+
+    let mut pitch_smoothing_opts = PitchSmoothingOptsBuilder::default();
+
+    if matches.is_present("smoothing_percentage") {
+        let smoothing_percentage =
+            value_t!(matches, "smoothing_percentage", f64).unwrap_or_else(|e| e.exit());
+        pitch_smoothing_opts.smoothing_percentage(smoothing_percentage);
+    }
+
+    Some(pitch_smoothing_opts.build().unwrap())
 }

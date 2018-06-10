@@ -1,5 +1,5 @@
 use super::note::Note;
-use constants::*;
+use constants::SAMPLE_RATE;
 
 pub struct SongIterator<'a> {
     notes: &'a [Note],

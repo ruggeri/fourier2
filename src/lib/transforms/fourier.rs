@@ -3,10 +3,13 @@ use util;
 
 #[derive(Builder, Clone, Copy)]
 pub struct FourierTransformOpts {
-    #[builder(default = "FOURIER_WINDOW_WIDTH")]
+    // How many seconds of samples should we use for short time transform.
+    #[builder(default = "DEFAULT_FOURIER_WINDOW_WIDTH")]
     pub window_width: f64,
-    #[builder(default = "FOURIER_SAMPLE_RATE_PER_SEC")]
-    pub sample_rate_per_sec: f64,
+
+    // When performing Fourier transform, could "downsample" for speed.
+    #[builder(default = "DEFAULT_FOURIER_SAMPLE_RATE")]
+    pub sample_rate: f64,
 }
 
 pub fn ftransform<F>(
@@ -21,7 +24,7 @@ where
     let start = (window_center - opts.window_width).max(0.0_f64);
     let end = window_center + (window_center - start);
     let total_width = end - start;
-    let num_samples = total_width * opts.sample_rate_per_sec;
+    let num_samples = total_width * opts.sample_rate;
 
     let mut sin_amplitude = 0.0_f64;
     let mut cos_amplitude = 0.0_f64;
@@ -32,7 +35,7 @@ where
         sin_amplitude += fun_val * util::sin_val_for_freq_at_time(freq, t);
         cos_amplitude += fun_val * util::cos_val_for_freq_at_time(freq, t);
 
-        t += 1.0_f64 / FOURIER_SAMPLE_RATE_PER_SEC;
+        t += 1.0_f64 / opts.sample_rate;
     }
 
     // Effectively divides by the period.

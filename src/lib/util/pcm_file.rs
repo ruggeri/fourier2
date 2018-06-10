@@ -1,5 +1,5 @@
 use byteorder::{ByteOrder, LittleEndian};
-use constants::*;
+use constants::SAMPLE_RATE;
 use std::fs::File;
 use std::io::prelude::*;
 use std::iter;

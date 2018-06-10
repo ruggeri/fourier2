@@ -28,9 +28,8 @@ pub fn main() {
         config::Mode::Scale => {
             let notes = commands::scan_notes(
                 &file,
-                config.do_smooth,
-                config.scan_smoothing_ratio,
                 config::scale_scanner_opts(&arg_matches),
+                config::scan_smoothing_opts(&arg_matches),
             ).collect::<Vec<Note>>();
             _write_output(&notes, config.output_fname);
         }

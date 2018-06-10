@@ -5,9 +5,11 @@ pub fn matches<'a>() -> ArgMatches<'a> {
     App::new("fourier2")
         .arg(
             Arg::with_name("mode")
+                .long("mode")
                 .takes_value(true)
                 .possible_values(&["hz", "scale"])
-                .default_value("scale"),
+                .default_value("scale")
+                .help("run in hz or scale searching mode"),
         )
         .arg(
             Arg::with_name("smooth")
@@ -24,7 +26,8 @@ pub fn matches<'a>() -> ArgMatches<'a> {
         .arg(
             Arg::with_name("scan_time_resolution")
                 .long("scan-time-resolution")
-                .takes_value(true),
+                .takes_value(true)
+                .help("how frequently to perform fourier transform"),
         )
         .arg(
             Arg::with_name("INPUT")

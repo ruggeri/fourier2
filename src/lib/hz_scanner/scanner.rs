@@ -1,5 +1,4 @@
 use super::opts::HzScannerOpts;
-use constants::*;
 use transforms::{ftransform, FourierTransformOpts};
 use util;
 
@@ -56,11 +55,11 @@ where
     fn next(&mut self) -> Option<Self::Item> {
         while self.hz <= self.opts.end_hz {
             let hz = self.hz;
-            self.hz += SCAN_HZ_RESOLUTION;
+            self.hz += self.opts.scan_hz_resolution;
 
             let coeffs = ftransform(hz, self.f, self.t, FourierTransformOpts::from(self.opts));
             let amplitude = util::amplitude(coeffs);
-            if amplitude > SCAN_AMPLITUDE_THRESHOLD {
+            if amplitude > self.opts.scan_amplitude_min_threshold {
                 return Some(DetectedHz {
                     hz,
                     amplitude,

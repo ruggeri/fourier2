@@ -1,5 +1,4 @@
 use super::opts::ScaleScannerOpts;
-use constants::*;
 use core::{self, Pitch};
 use transforms::{ftransform, FourierTransformOpts};
 use util;
@@ -63,7 +62,7 @@ where
                 FourierTransformOpts::from(self.opts),
             );
             let amplitude = util::amplitude(coeffs);
-            if amplitude > SCAN_AMPLITUDE_THRESHOLD {
+            if amplitude > self.opts.scan_amplitude_min_threshold {
                 return Some(DetectedPitch {
                     pitch,
                     amplitude,

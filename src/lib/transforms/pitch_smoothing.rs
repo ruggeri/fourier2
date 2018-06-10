@@ -1,7 +1,17 @@
 #![allow(unknown_lints)]
 
+use constants::*;
 use scale_scanner::DetectedPitch;
 use std::iter::Peekable;
+
+#[derive(Builder, Clone, Copy)]
+pub struct PitchSmoothingOpts {
+    // Consider the frequency with the highest amplitude. We're going to
+    // drop frequencies with less amplitude. Anything with less than
+    // smoothing_percentage * max_freq_amplitude is dropped.
+    #[builder(default = "DEFAULT_SMOOTHING_PERCENTAGE")]
+    smoothing_percentage: f64,
+}
 
 // TODO: THIS CODE IS AN ABOMINATION.
 
@@ -13,7 +23,7 @@ where
 {
     iter: Peekable<Iter>,
     group_iter: Option<VecIter>,
-    smoothing_ratio: f64,
+    opts: PitchSmoothingOpts,
 }
 
 impl<Iter> Iterator for SmoothedPitchIterator<Iter>
@@ -59,7 +69,7 @@ where
         }
 
         let max_amplitude = group.iter().fold(0.0_f64, |max, n| max.max(n.amplitude));
-        let smoothing_ratio = self.smoothing_ratio;
+        let smoothing_ratio = self.opts.smoothing_percentage;
         let group = group
             .into_iter()
             .filter(|n| n.amplitude > (max_amplitude * smoothing_ratio));
@@ -74,18 +84,18 @@ pub trait SmoothablePitchIterator
 where
     Self: Sized + Iterator<Item = DetectedPitch>,
 {
-    fn smooth(self, f64) -> SmoothedPitchIterator<Self>;
+    fn smooth(self, opts: PitchSmoothingOpts) -> SmoothedPitchIterator<Self>;
 }
 
 impl<Iter> SmoothablePitchIterator for Iter
 where
     Self: Sized + Iterator<Item = DetectedPitch>,
 {
-    fn smooth(self, smoothing_ratio: f64) -> SmoothedPitchIterator<Self> {
+    fn smooth(self, opts: PitchSmoothingOpts) -> SmoothedPitchIterator<Self> {
         SmoothedPitchIterator {
             iter: self.peekable(),
             group_iter: None,
-            smoothing_ratio,
+            opts,
         }
     }
 }
