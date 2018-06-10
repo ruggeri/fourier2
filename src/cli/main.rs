@@ -17,15 +17,22 @@ pub fn main() {
     println!("Reading PCM input file!");
     let file = PCMFile::open(config.input_fname);
 
-    // for _ in _scan_hz(&file) {
-    //   ; // Do nothing. Force evaluation.
-    // }
+    match config.mode {
+        config::Mode::Hz => {
+            let hzs = commands::scan_hz(&file, config::hz_scanner_opts(&arg_matches));
 
-    let notes = commands::scan_notes(
-        &file,
-        config.do_smooth,
-        config.scan_smoothing_ratio,
-        config::scale_scanner_opts(&arg_matches),
-    ).collect::<Vec<Note>>();
-    _write_output(&notes, config.output_fname);
+            for _ in hzs {
+              ; // Do nothing. Force evaluation.
+            }
+        }
+        config::Mode::Scale => {
+            let notes = commands::scan_notes(
+                &file,
+                config.do_smooth,
+                config.scan_smoothing_ratio,
+                config::scale_scanner_opts(&arg_matches),
+            ).collect::<Vec<Note>>();
+            _write_output(&notes, config.output_fname);
+        }
+    }
 }

@@ -4,6 +4,12 @@ use clap::{App, Arg, ArgMatches};
 pub fn matches<'a>() -> ArgMatches<'a> {
     App::new("fourier2")
         .arg(
+            Arg::with_name("mode")
+                .takes_value(true)
+                .possible_values(&["hz", "scale"])
+                .default_value("scale"),
+        )
+        .arg(
             Arg::with_name("smooth")
                 .long("smooth")
                 .help("should smoothing be used?"),

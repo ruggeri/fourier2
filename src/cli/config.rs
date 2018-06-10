@@ -6,7 +6,13 @@ use fourier2::{
     scale_scanner::{ScaleScannerOpts, ScaleScannerOptsBuilder},
 };
 
+pub enum Mode {
+    Hz,
+    Scale,
+}
+
 pub struct Config<'a> {
+    pub mode: Mode,
     pub input_fname: &'a str,
     pub output_fname: &'a str,
     pub do_smooth: bool,
@@ -14,8 +20,16 @@ pub struct Config<'a> {
     pub scan_smoothing_ratio: f64,
 }
 
+use self::Mode::*;
+
 impl<'a> Config<'a> {
     pub fn new(matches: &'a ArgMatches<'a>) -> Config<'a> {
+        let mode = match matches.value_of("mode").unwrap() {
+            "hz" => Hz,
+            "scale" => Scale,
+            _ => unreachable!(),
+        };
+
         let scan_smoothing_ratio = if matches.is_present("smoothing-ratio") {
             value_t!(matches, "smoothing-ratio", f64).unwrap_or_else(|e| e.exit())
         } else {
@@ -23,6 +37,7 @@ impl<'a> Config<'a> {
         };
 
         Config {
+            mode,
             input_fname: matches.value_of("INPUT").unwrap(),
             output_fname: matches.value_of("OUTPUT").unwrap(),
             do_smooth: matches.is_present("smooth"),
