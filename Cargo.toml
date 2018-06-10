@@ -8,6 +8,10 @@ clap = "2.31.2"
 derive_builder = "0.5.1"
 rand = "0.5.0"
 
+[[bin]]
+name = "fourier2"
+path = "src/main/mod.rs"
+
 [lib]
 name = "fourier2"
 path = "src/lib/mod.rs"
