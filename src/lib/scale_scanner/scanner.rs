@@ -1,14 +1,14 @@
 use super::opts::ScaleScannerOpts;
-use core::{self, Pitch};
+use core::{self, AudioSource, Pitch};
 use transforms::{ftransform, FourierTransformOpts};
 use util;
 
-pub struct ScaleScanner<'a, F>
+pub struct ScaleScanner<'a, AS>
 where
-    F: Fn(f64) -> f64 + Copy,
+    AS: AudioSource + 'a,
 {
     piano_pitches: <&'a Vec<Pitch> as IntoIterator>::IntoIter,
-    f: F,
+    source: &'a AS,
     t: f64,
     opts: ScaleScannerOpts,
 }
@@ -20,25 +20,25 @@ pub struct DetectedPitch {
     pub time: f64,
 }
 
-impl<'a, F> ScaleScanner<'a, F>
+impl<'a, AS> ScaleScanner<'a, AS>
 where
-    F: Fn(f64) -> f64 + Copy,
+    AS: AudioSource,
 {
-    pub fn new(f: F, t: f64, opts: ScaleScannerOpts) -> ScaleScanner<'a, F> {
+    pub fn new(source: &'a AS, t: f64, opts: ScaleScannerOpts) -> ScaleScanner<'a, AS> {
         ScaleScanner {
             piano_pitches: core::piano_pitches().iter(),
-            f,
+            source,
             t,
             opts,
         }
     }
 
     pub fn scan(
-        f: F,
+        f: &'a AS,
         start_t: f64,
         duration: f64,
         opts: ScaleScannerOpts,
-    ) -> impl Iterator<Item = DetectedPitch> {
+    ) -> impl Iterator<Item = DetectedPitch> + 'a {
         let samples = (duration / opts.scan_time_resolution) as usize;
         (0..samples).flat_map(move |idx| {
             let t = start_t + (idx as f64) * opts.scan_time_resolution;
@@ -47,9 +47,9 @@ where
     }
 }
 
-impl<'a, F> Iterator for ScaleScanner<'a, F>
+impl<'a, AS> Iterator for ScaleScanner<'a, AS>
 where
-    F: Fn(f64) -> f64 + Copy,
+    AS: AudioSource,
 {
     type Item = DetectedPitch;
 
@@ -57,7 +57,7 @@ where
         while let Some(&pitch) = self.piano_pitches.next() {
             let coeffs = ftransform(
                 pitch.hz as f64,
-                self.f,
+                self.source,
                 self.t,
                 FourierTransformOpts::from(self.opts),
             );

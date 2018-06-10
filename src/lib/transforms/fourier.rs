@@ -1,4 +1,5 @@
 use constants::*;
+use core::AudioSource;
 use util;
 
 #[derive(Builder, Clone, Copy)]
@@ -12,17 +13,17 @@ pub struct FourierTransformOpts {
     pub sample_rate: f64,
 }
 
-pub fn ftransform<F>(
+pub fn ftransform<'a, AS>(
     freq: f64,
-    fun: F,
+    source: &'a AS,
     window_center: f64,
     opts: FourierTransformOpts,
 ) -> (f64, f64)
 where
-    F: Fn(f64) -> f64,
+    AS: AudioSource,
 {
     let start = (window_center - opts.window_width).max(0.0_f64);
-    let end = window_center + (window_center - start);
+    let end = (window_center + (window_center - start)).min(source.duration());
     let total_width = end - start;
     let num_samples = total_width * opts.sample_rate;
 
@@ -31,7 +32,7 @@ where
 
     let mut t = start;
     while t <= end {
-        let fun_val = fun(t);
+        let fun_val = source.val_at_time(t);
         sin_amplitude += fun_val * util::sin_val_for_freq_at_time(freq, t);
         cos_amplitude += fun_val * util::cos_val_for_freq_at_time(freq, t);
 

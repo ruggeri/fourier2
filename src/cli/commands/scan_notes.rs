@@ -6,16 +6,16 @@ use fourier2::{
 };
 
 pub fn scan_notes<'a>(
-    file: &'a PCMFile,
+    pcm_file: &'a PCMFile,
     scan_opts: ScaleScannerOpts,
     smoothing_opts: Option<PitchSmoothingOpts>,
 ) -> impl Iterator<Item = Note> + 'a {
     println!("Searching for notes!");
     let mut iter: Box<Iterator<Item = DetectedPitch>>;
     iter = Box::new(ScaleScanner::scan(
-        move |t| file.val(t),
+        pcm_file,
         0.0,
-        file.duration(),
+        pcm_file.duration(),
         scan_opts,
     ));
 

@@ -1,5 +1,6 @@
 use byteorder::{ByteOrder, LittleEndian};
 use constants::SAMPLE_RATE;
+use core::AudioSource;
 use std::fs::File;
 use std::io::prelude::*;
 use std::iter;
@@ -29,13 +30,16 @@ impl PCMFile {
             i16s: i16s_vec_1chan,
         }
     }
+}
 
-    pub fn val(&self, t: f64) -> f64 {
+impl AudioSource for PCMFile {
+    fn val_at_time(&self, t: f64) -> f64 {
         let idx = (t * SAMPLE_RATE) as usize;
+
         util::i16_to_f64(self.i16s[idx])
     }
 
-    pub fn duration(&self) -> f64 {
+    fn duration(&self) -> f64 {
         (self.i16s.len() as f64) / SAMPLE_RATE
     }
 }

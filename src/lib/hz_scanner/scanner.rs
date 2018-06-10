@@ -1,12 +1,13 @@
 use super::opts::HzScannerOpts;
+use core::AudioSource;
 use transforms::{ftransform, FourierTransformOpts};
 use util;
 
-pub struct HzScanner<F>
+pub struct HzScanner<'a, AS>
 where
-    F: Fn(f64) -> f64 + Copy,
+    AS: AudioSource + 'a,
 {
-    f: F,
+    source: &'a AS,
     t: f64,
     hz: f64,
     opts: HzScannerOpts,
@@ -19,13 +20,13 @@ pub struct DetectedHz {
     pub time: f64,
 }
 
-impl<F> HzScanner<F>
+impl<'a, AS> HzScanner<'a, AS>
 where
-    F: Fn(f64) -> f64 + Copy,
+    AS: AudioSource,
 {
-    pub fn new(f: F, t: f64, opts: HzScannerOpts) -> HzScanner<F> {
+    pub fn new(source: &'a AS, t: f64, opts: HzScannerOpts) -> HzScanner<'a, AS> {
         HzScanner {
-            f,
+            source,
             t,
             hz: opts.start_hz,
             opts,
@@ -33,22 +34,22 @@ where
     }
 
     pub fn scan(
-        f: F,
+        source: &'a AS,
         start_t: f64,
         duration: f64,
         opts: HzScannerOpts,
-    ) -> impl Iterator<Item = DetectedHz> {
+    ) -> impl Iterator<Item = DetectedHz> + 'a {
         let samples = (duration / opts.scan_time_resolution) as usize;
         (0..samples).flat_map(move |idx| {
             let t = start_t + (idx as f64) * opts.scan_time_resolution;
-            HzScanner::new(f, t, opts)
+            HzScanner::new(source, t, opts)
         })
     }
 }
 
-impl<F> Iterator for HzScanner<F>
+impl<'a, AS> Iterator for HzScanner<'a, AS>
 where
-    F: Fn(f64) -> f64 + Copy,
+    AS: AudioSource,
 {
     type Item = DetectedHz;
 
@@ -57,7 +58,12 @@ where
             let hz = self.hz;
             self.hz += self.opts.scan_hz_resolution;
 
-            let coeffs = ftransform(hz, self.f, self.t, FourierTransformOpts::from(self.opts));
+            let coeffs = ftransform(
+                hz,
+                self.source,
+                self.t,
+                FourierTransformOpts::from(self.opts),
+            );
             let amplitude = util::amplitude(coeffs);
             if amplitude > self.opts.scan_amplitude_min_threshold {
                 return Some(DetectedHz {
