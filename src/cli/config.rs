@@ -1,7 +1,8 @@
 use clap::ArgMatches;
 use constants::*;
 use fourier2::{
-    self, hz_scanner::{HzScannerOpts, HzScannerOptsBuilder},
+    self,
+    hz_scanner::{HzScannerOpts, HzScannerOptsBuilder},
     scale_scanner::{ScaleScannerOpts, ScaleScannerOptsBuilder},
 };
 

@@ -1,7 +1,8 @@
 use {args, commands, config};
 
 use fourier2::{
-    core::*, util::{self, PCMFile},
+    core::*,
+    util::{self, PCMFile},
 };
 
 fn _write_output(notes: &[Note], output_fname: &str) {
