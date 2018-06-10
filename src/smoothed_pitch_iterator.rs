@@ -1,5 +1,4 @@
 use std::iter::Peekable;
-use super::constants::*;
 use super::scale_scanner::DetectedPitch;
 
 // TODO: THIS CODE IS AN ABOMINATION.
@@ -10,6 +9,7 @@ pub struct SmoothedPitchIterator<Iter>
   where Iter: Iterator<Item=DetectedPitch> {
   iter: Peekable<Iter>,
   group_iter: Option<VecIter>,
+  smoothing_ratio: f64,
 }
 
 impl<Iter> Iterator for SmoothedPitchIterator<Iter>
@@ -52,7 +52,8 @@ impl<Iter> Iterator for SmoothedPitchIterator<Iter>
     }
 
     let max_amplitude = group.iter().fold(0.0_f64, |max, n| max.max(n.amplitude));
-    let group = group.into_iter().filter(|n| n.amplitude > (max_amplitude / SCAN_SMOOTHING_RATIO));
+    let smoothing_ratio = self.smoothing_ratio;
+    let group = group.into_iter().filter(|n| n.amplitude > (max_amplitude * smoothing_ratio));
     let group = group.collect::<Vec<_>>();
     self.group_iter = Some(group.into_iter());
 
@@ -62,16 +63,17 @@ impl<Iter> Iterator for SmoothedPitchIterator<Iter>
 
 pub trait SmoothablePitchIterator
   where Self: Sized + Iterator<Item=DetectedPitch> {
-  fn smooth(self) -> SmoothedPitchIterator<Self>;
+  fn smooth(self, f64) -> SmoothedPitchIterator<Self>;
 }
 
 impl<Iter> SmoothablePitchIterator for Iter
   where Self: Sized + Iterator<Item=DetectedPitch> {
 
-  fn smooth(self) -> SmoothedPitchIterator<Self> {
+  fn smooth(self, smoothing_ratio: f64) -> SmoothedPitchIterator<Self> {
     SmoothedPitchIterator {
       iter: self.peekable(),
       group_iter: None,
+      smoothing_ratio,
     }
   }
 }
