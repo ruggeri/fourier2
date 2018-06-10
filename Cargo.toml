@@ -10,3 +10,4 @@ rand = "0.5.0"
 
 [lib]
 name = "fourier2"
+path = "src/lib/mod.rs"
